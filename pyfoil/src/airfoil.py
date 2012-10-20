@@ -395,7 +395,7 @@ class Airfoil:
 if __name__ == "__main__":
 
     airfoil = Airfoil()
-    airfoil.setFoil(101,"fullcos")
+    airfoil.setFoil(201,"fullcos")
     
     airfoil.genNACA4(0010)
     #airfoil.genNACA5(21010)

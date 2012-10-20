@@ -12,7 +12,7 @@ from dxfwrite import DXFEngine as dxf
 
 def main(argv):                         
     filename = '../../ag03.dat'
-    chord = 10
+    chord = 300.0
                       
     try:
         opts, args = getopt.getopt(argv, "c:f:o:", ["chord=", "filename=", "outputfilename="])
@@ -33,9 +33,9 @@ def main(argv):
     saveName = root+'.dxf'    
     drawing = dxf.drawing(saveName)
     #I found the below constant on the internet,  this could use verification
-    scale = 100 
-    xOffset = 0 
-    yOffset = 0
+    scale = 1.0 
+    xOffset = 0.0 
+    yOffset = 0.0
     
     
     linePoints = []
@@ -48,10 +48,11 @@ def main(argv):
         if(line!=0):
             #Format and store in a string
             p= ((float(row[0])*chord+xOffset)*scale, (float(row[1])*-chord+yOffset)*scale)
+            p = (float(row[0])*chord, float(row[1])*chord)
             linePoints.append(p)
-            
+            print p,'x', (row[0],row[1])
         line=1            
-    print linePoints
+
     
     polyline= dxf.polyline(linetype='CONTINUOUS')
     polyline.add_vertices( linePoints )
@@ -63,5 +64,5 @@ def main(argv):
 if __name__ == "__main__":
 	main(sys.argv[1:])
 
-#python foil2svg1.py -c 3 -f ../../0010.dat -o ../../0010.svg
+#python gendxfwrite.py -c 3 -f ../../0010.dat -o ../../0010.svg
 
