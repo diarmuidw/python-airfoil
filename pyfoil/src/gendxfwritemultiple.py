@@ -33,10 +33,10 @@ def main(argv):
     saveName = root+'.dxf'    
     drawing = dxf.drawing(saveName)
     #I found the below constant on the internet,  this could use verification
-    chordnumber = 0.0
+    chordnumber = 1.0
     for c in chord:
         scale = 1.0 
-        xOffset = 0.0 
+        xOffset = 45.0 
         yOffset = 45.0
         
         
@@ -50,7 +50,9 @@ def main(argv):
             if(line!=0):
                 #Format and store in a string
                 #p= ((float(row[0])*chord+xOffset)*scale, (float(row[1])*-chord+yOffset)*scale)
-                p = ( float(row[1])*c + yOffset*chordnumber, float(row[0])*c )
+                #swap the pomits around to orinetate vertically
+                
+                p = ( float(row[1])*c + xOffset*chordnumber , float(row[0])*c )
                 linePoints.append(p)
                 print p,'x', (row[0],row[1])
             line=1            
