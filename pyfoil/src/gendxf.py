@@ -6,17 +6,17 @@ import sys
 import getopt
 import os.path
 
-from pysvg.shape import *
-from pysvg.builders import *
+
+import sdxf
+#http://www.kellbot.com/sdxf-python-library-for-dxf/
 
 
-#def ComplexShapes():
 def main(argv):                         
     filename = '../../ag03.dat'
     chord = 10
                       
     try:
-        opts, args = getopt.getopt(argv, "c:f:o:", ["chord=", "filename="])
+        opts, args = getopt.getopt(argv, "c:f:o:", ["chord=", "filename=", "outputfilename="])
     except getopt.GetoptError:          
         usage()                         
         sys.exit(2)
@@ -29,14 +29,19 @@ def main(argv):
         elif opt in ("-o", "outputfilename="): 
             outputfilename = str(arg)          
 
+    #DXF related INIT
     
-    
+    d=sdxf.Drawing()
+    d.layers.append(sdxf.Layer(name="textlayer",color=3))
+    d.layers.append(sdxf.Layer(name="drawinglayer",color=2))
     #I found the below constant on the internet,  this could use verification
     scale = 100 
     xOffset = 0 
-    yOffset = 0 
+    yOffset = 0
     
-    pts = ""
+    
+    linePoints = []
+    #pts = ""
     line= 0
     # Read airfoil data
     spamReader = csv.reader(open(filename, 'rb'), delimiter=' ', quotechar='|', skipinitialspace="true")
@@ -44,21 +49,23 @@ def main(argv):
         #Skip the first line of header information
         if(line!=0):
             #Format and store in a string
-            pts+= str((float(row[0])*chord+xOffset)*scale)+","+str((float(row[1])*-chord+yOffset)*scale)+"  "
+            p= ((float(row[0])*chord+xOffset)*scale, (float(row[1])*-chord+yOffset)*scale)
+            linePoints.append(p)
+            d.layers.append(sdxf.Point(points=(row[0], row[1]), layer="drawinglayer"))
         line=1            
-
-    oh=ShapeBuilder()
-    mySVG=svg("test")
-    #Create a polyline using the formatted airfoil data string
-    pl=oh.createPolyline(points=pts,strokewidth=1, stroke='blue')
-    mySVG.addElement(pl)
+    print linePoints
+    d.append(sdxf.Text('Hello World!',point=(3,0),layer="textlayer"))
+    d.layers.append(sdxf.Layer(name="drawinglayer",color=2))
+    d.append(sdxf.Text('BLUEKULU!',point=(20,20),layer="drawinglayer"))
+    #d.layers.append(sdxf.LineList(points=linePoints, layer="drawinglayer"))
+    
 
     (root, ext) = os.path.splitext(outputfilename)
-    saveName = root+'.svg'    
-    mySVG.save(saveName)
+    saveName = root+'.dxf'    
+    d.saveas(saveName)
  
 if __name__ == "__main__":
-    main(sys.argv[1:])
+	main(sys.argv[1:])
 
 #python foil2svg1.py -c 3 -f ../../0010.dat -o ../../0010.svg
 

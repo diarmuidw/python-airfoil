@@ -6,17 +6,16 @@ import sys
 import getopt
 import os.path
 
-from pysvg.shape import *
-from pysvg.builders import *
+
+from dxfwrite import DXFEngine as dxf
 
 
-#def ComplexShapes():
 def main(argv):                         
     filename = '../../ag03.dat'
     chord = 10
                       
     try:
-        opts, args = getopt.getopt(argv, "c:f:o:", ["chord=", "filename="])
+        opts, args = getopt.getopt(argv, "c:f:o:", ["chord=", "filename=", "outputfilename="])
     except getopt.GetoptError:          
         usage()                         
         sys.exit(2)
@@ -29,14 +28,18 @@ def main(argv):
         elif opt in ("-o", "outputfilename="): 
             outputfilename = str(arg)          
 
-    
-    
+    #DXF related INIT
+    (root, ext) = os.path.splitext(outputfilename)
+    saveName = root+'.dxf'    
+    drawing = dxf.drawing(saveName)
     #I found the below constant on the internet,  this could use verification
     scale = 100 
     xOffset = 0 
-    yOffset = 0 
+    yOffset = 0
     
-    pts = ""
+    
+    linePoints = []
+    #pts = ""
     line= 0
     # Read airfoil data
     spamReader = csv.reader(open(filename, 'rb'), delimiter=' ', quotechar='|', skipinitialspace="true")
@@ -44,21 +47,21 @@ def main(argv):
         #Skip the first line of header information
         if(line!=0):
             #Format and store in a string
-            pts+= str((float(row[0])*chord+xOffset)*scale)+","+str((float(row[1])*-chord+yOffset)*scale)+"  "
+            p= ((float(row[0])*chord+xOffset)*scale, (float(row[1])*-chord+yOffset)*scale)
+            linePoints.append(p)
+            
         line=1            
-
-    oh=ShapeBuilder()
-    mySVG=svg("test")
-    #Create a polyline using the formatted airfoil data string
-    pl=oh.createPolyline(points=pts,strokewidth=1, stroke='blue')
-    mySVG.addElement(pl)
-
-    (root, ext) = os.path.splitext(outputfilename)
-    saveName = root+'.svg'    
-    mySVG.save(saveName)
- 
+    print linePoints
+    
+    polyline= dxf.polyline(linetype='CONTINUOUS')
+    polyline.add_vertices( linePoints )
+    drawing.add(polyline)
+    drawing.save()
+    
+    
+    
 if __name__ == "__main__":
-    main(sys.argv[1:])
+	main(sys.argv[1:])
 
 #python foil2svg1.py -c 3 -f ../../0010.dat -o ../../0010.svg
 

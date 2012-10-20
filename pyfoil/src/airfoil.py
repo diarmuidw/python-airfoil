@@ -407,5 +407,5 @@ if __name__ == "__main__":
     #airfoil.rotate(5.0)
     #airfoil.scale(300.0)
     #airfoil.output()
-    airfoil.fileoutput('0010.dat')
+    airfoil.fileoutput('../../0010.dat')
 
